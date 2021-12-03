@@ -1,6 +1,7 @@
 # region Imports
 from collections import Counter
 import classes
+from classes import Clock
 from classes import Player
 from classes import Action_Menu
 from classes import Travel_Menu
@@ -13,11 +14,13 @@ from classes import Raw_Material
 
 from dialogue import Dialogue
 import os
+
 # endregion
 
 
 # region GLOBAL OBJECTS
 player = Player('')
+clock = Clock()
 action_menu = Action_Menu('action')
 travel_menu = Travel_Menu('travel')
 player_menu = Player_Menu('player')
@@ -25,17 +28,21 @@ player_menu = Player_Menu('player')
 
 # endregion
 
+
 # region Utility Functions
 def clear():
     os.system('cls')
+
+
 def pause():
     input("press enter to continue")
+
+
 def select():
     a = input("----->")
     return a
-# endregion
 
-# region Character Creation
+
 def character_creation(player):
     clear()
     print("Welcome to my game")
@@ -75,17 +82,16 @@ def character_creation(player):
         a = select()
     clear()
     if a.lower() == '1':  # blacksmith stats
-        player_stats = {'type': 1, 'one_handed': 15, 'two_handed': 5, 'intelligence': 2, 'archery': 0, 'defence': 0,
+        player_stats = {'type': 1, 'melee': 15, 'intelligence': 2, 'archery': 0, 'defence': 0,
                         'health': 125, 'mana': 0, 'stamina': 125}
     elif a.lower() == '2':  # hunter stats
-        player_stats = {'type': 2, 'one_handed': 1, 'two_handed': 10, 'intelligence': 5, 'archery': 10, 'defence': 0,
+        player_stats = {'type': 2, 'melee': 1, 'intelligence': 5, 'archery': 10, 'defence': 0,
                         'health': 100, 'mana': 20, 'stamina': 100}
     else:  # scholar stats
-        player_stats = {'type': 3, 'one_handed': 1, 'two_handed': 1, 'intelligence': 15, 'archery': 1, 'defence': 0,
+        player_stats = {'type': 3, 'melee': 1, 'intelligence': 15, 'archery': 1, 'defence': 0,
                         'health': 75, 'mana': 100, 'stamina': 75}
     player.type = player_stats['type']
-    player.one_handed = player_stats['one_handed']
-    player.two_handed = player_stats['two_handed']
+    player.melee = player_stats['melee']
     player.intelligence = player_stats['intelligence']
     player.archery = player_stats['archery']
     player.defence = player_stats['defence']
@@ -93,9 +99,11 @@ def character_creation(player):
     player.mana = player_stats['mana']
     player.stamina = player_stats['stamina']
     clear()
-# endregion
 
-# region Start Day Functions
+
+
+
+
 def startDay1(player):
     if player.type == 1:
         print("Day 1")
@@ -108,8 +116,8 @@ def startDay1(player):
         clear()
         player.add_quest('craft leather armor')
         # need to a add getting a hammer
-        # print('smiths hammer equiped')
-        pause()
+        # print('smiths hammer equipped')
+
 
     elif player.type == 2:
         print("Day 1")
@@ -135,6 +143,8 @@ def startDay1(player):
         player.add_quest('brew a healing potion')
         player.add_quest('study')
     return travel(hut)
+
+
 def startDay2(player, clock1, heroInventory, stock, actions, travels, skills, fire):
     clock1.day2 = True
     if player.getType() == 1:
@@ -159,6 +169,8 @@ def startDay2(player, clock1, heroInventory, stock, actions, travels, skills, fi
         print('\nQuest: Escape through the sewers')
         heroInventory.currentQuests.append('escape through the sewers')
         travels.secretPassage = Tru
+
+
 # def startDay3(player, clock1, heroInventory, stock, actions, travels, skills, fire):
 #     clock1.day3 = True
 #     if player.getType() == 1:
@@ -217,7 +229,10 @@ def startDay2(player, clock1, heroInventory, stock, actions, travels, skills, fi
 # endregion
 
 
-# region ##################################### MAIN MENUS ################################################
+#  Clock functions
+
+
+# region MAIN MENUS
 def inventory():
     clear()
     player.show_inventory()
@@ -225,6 +240,7 @@ def inventory():
     while a not in ['x', 'X', 'e', 'E', 'u', 'U']: a = select()
     if a.lower() == 'x': give_options()
     if a.lower() == 'e': equip_items()
+
 
 def equip_items():  # also unequips items
     clear()
@@ -237,32 +253,30 @@ def equip_items():  # also unequips items
     if len(player.armor) > 0: options.extend(['a', 'A'])
     if len(player.charm) > 0: options.extend(['c', 'C'])
 
-
     a = select()
-    while a not in options and a not in equip_menu.menu_options.keys(): a = select() #  need to allow you to actually pick up a weapon
-    if a.lower() == 'x': inventory()
+    while a not in options and a not in equip_menu.menu_options.keys(): a = select()  # need to allow you to actually pick up a weapon
+    if a.lower() == 'x':
+        inventory()
     elif a.lower() in options:
-        if a.lower() == 'm': item = player.main_hand[0]
-        elif a.lower() == 'o': item = player.off_hand[0]
-        elif a.lower() == 'a': item = player.armor[0]
-        else: item = player.charm[0]
+        if a.lower() == 'm':
+            item = player.main_hand[0]
+        elif a.lower() == 'o':
+            item = player.off_hand[0]
+        elif a.lower() == 'a':
+            item = player.armor[0]
+        else:
+            item = player.charm[0]
         player.unequip_item(item)
         player.add_item(item, 1)
 
 
     else:  # equip items
         item = equip_menu.menu_options[a]
-        player.equip_item(item)
-        player.remove_item(item, 1)
-        player.inventory += Counter()
-
+        if player.equip_item(item):
+            player.remove_item(item, 1)
+            player.inventory += Counter()
 
     equip_items()
-
-
-
-
-
 
 
 def combat():
@@ -270,80 +284,116 @@ def combat():
     print('You are in combat')
     pause()
     give_options()
+
+
 def current_stats():
-    clear()
-    print('You are in current stats')
-    pause()
+    player.show_current_stats()
+    a = select()
+    while a not in ['x', 'X']: a = select()
     give_options()
-def skills():
-    clear()
-    print('You are in current skills')
-    pause()
-    give_options()
+
+
 def eat():
     clear()
     print('You are eating')
     pause()
     give_options()
+
+
 def quests():
     clear()
-    print('You are in quests')
-    pause()
+    print('CURRENT QUESTS:')
+    for current_quest in player.get_current_quests():
+        print(current_quest)
+
+    print('\nCOMPLETED QUESTS:')
+    for completed_quest in player.get_completed_quests():
+        print(completed_quest)
+
+    print('\nX ---> Back\n')
+
+    a = select()
+    while a not in ['x', 'X']: a = select()
     give_options()
+
+
 # endregion
 
 
-# region ################################### LOCATION ACTIONS ############################################
+# region LOCATION ACTIONS
 def sleep():
     clear()
     print('You are sleeping')
     pause()
     give_options()
+
+
 def cook():
     clear()
     print('You are cooking')
     pause()
     give_options()
+
+
 def light_fire():
     clear()
     print('You light the fire')
     pause()
     give_options()
+
+
 def fish():
     clear()
     print('You are fishing')
     pause()
     give_options()
+
+
 def gather_sticks():
     clear()
+    player.show_stats()
+    clock.display_time()
+    a = input('--->')
     print('You are gathering sticks')
     pause()
     give_options()
+
+
 def hunt_deer():
     clear()
     print('You are hunting deer')
     pause()
     give_options()
+
+
 def search_for_steel():
     clear()
     print('You are searching for steel')
     pause()
     give_options()
+
+
 def gather_fiber():
     clear()
     print('You are gathering fiber')
     pause()
     give_options()
+
+
 def pick_berries():
     clear()
     print('You are picking berries')
     pause()
     give_options()
+
+
 def pray():
     clear()
     print('You are praying')
     pause()
     give_options()
+
+
 # region Shopping
 def enter_shop():
     clear()
@@ -357,6 +407,7 @@ def enter_shop():
     while not a.upper() in options.keys(): a = select()
     function_map[a.upper()]()
 
+
 def buy_items():
     clear()
     shop = Shop(player.gold, item_prices)
@@ -366,6 +417,7 @@ def buy_items():
     SHOP_MAP[a]()
     pause()
     enter_shop()
+
 
 def shop_raw_materials():
     clear()
@@ -384,6 +436,8 @@ def shop_food():
     clear()
     shop = Shop(player.gold, item_prices)
     shop.display_food()
+
+
 def shop_weapons():
     clear()
     shop = Shop(player.gold, item_prices)
@@ -399,16 +453,23 @@ def shop_weapons():
 
 def shop_armor():
     shop.display_armor()
+
+
 def shop_arrows():
     shop.display_arrows()
+
+
 def shop_potions():
     shop.display_potions()
+
 
 def sell_items():
     clear()
     print('You are selling items')
     pause()
     enter_shop()
+
+
 # endregion
 
 def enter_hunting_tavern():
@@ -416,10 +477,12 @@ def enter_hunting_tavern():
     print('You are entering the hunting tavern')
     pause()
     give_options()
+
+
 # endregion
 
 
-# region #################################### CORE BACKEND ###############################################
+# region TRAVEL FUNCTIONS
 # -----------------------> Generates and updates the main menu when you travel <------------------------- #
 def update_options(location):
     global index
@@ -436,6 +499,7 @@ def update_options(location):
         index += 1
 
     return index
+
 
 def give_options():
     clear()
@@ -461,7 +525,8 @@ def give_options():
 
     while a not in choices:
         a = select()
-
+        if type(a) is str:
+            a = a.capitalize()
 
     if a in player_menu.options.keys():
         MAIN_MENU_MAP[player_menu.options[a]]()  # run the main menu functions
@@ -472,18 +537,22 @@ def give_options():
     elif int(a) in travel_menu.locations.keys():
         travel(TRAVEL_MAP[travel_menu.locations[int(a)]])  # travel to the location
 
+
 def check_has_been(location):  # sees if its the first time you visited a location to give unique dialouge
     if location.has_been_to == False: location.has_been_to = True, Dialogue.show_dialogue(location.name)
+
 
 def travel(location):
     player.location = location.name
     check_has_been(location)
     index = update_options(location)
     give_options()  # the options the player gets is updated # test
+
+
 # endregion
 
 
-# region ##################################### LOCATIONS #################################################
+# region LOCATIONS
 # HUNTER LOCATIONS
 hut = Location('hut', ['sleep', 'cook', 'light fire'], ['forest', 'river', 'meadows', 'village'])
 river = Location('river', ['fish'], ['hut'])
@@ -499,30 +568,31 @@ crossroads = Location('crossroads', [], ['village', 'outskirts'])
 
 # endregion
 
-# region ################################## ITEMS ###########################################
+
+# region ITEMS
 # Raw Material
 iron_ore = Raw_Material('iron ore')
 # Weapons
-smiths_hammer = Weapon('smiths hammer', 10)
+smiths_hammer = Weapon('smiths hammer', 10, 'melee')
 item_prices = {'logs': 4, 'bait': 1, 'iron ore': 10, 'pelt': 10, 'oil': 15, 'cooked fish': 15,
-                            'berry stew': 10,
-                            'fishing pole': 15, 'wooden bow': 75, 'hunters bow': 300, 'leather armor': 30,
-                            'rabbits foot': 50,
-                            'crimson amulet': 75, 'lexicon': 100, 'morellonomicon': 300, 'smiths hammer': 25,
-                            'steel hammer': 300, 'iron armor': 150, 'steel armor': 300, 'wooden arrows': 5,
-                            'iron arrows': 15,
-                            'steel arrows': 30, 'flaming arrows': 40, 'weak healing potion': 10,
-                            'medium healing potion': 25,
-                            'strong healing potion': 50, 'fire resist potion': 25, 'frost resist potion': 25,
-                            'poisen resist potion': 25}
+               'berry stew': 10,
+               'fishing pole': 15, 'wooden bow': 75, 'hunters bow': 300, 'leather armor': 30,
+               'rabbits foot': 50,
+               'crimson amulet': 75, 'lexicon': 100, 'morellonomicon': 300, 'smiths hammer': 25,
+               'steel hammer': 300, 'iron armor': 150, 'steel armor': 300, 'wooden arrows': 5,
+               'iron arrows': 15,
+               'steel arrows': 30, 'flaming arrows': 40, 'weak healing potion': 10,
+               'medium healing potion': 25,
+               'strong healing potion': 50, 'fire resist potion': 25, 'frost resist potion': 25,
+               'poisen resist potion': 25}
 # endregion
 
-# region ################################### FUNCTION MAPS ###############################################
+
+# region FUNCTION MAPS
 MAIN_MENU_MAP = {
     'inventory': inventory,
     'combat': combat,
     'current_stats': current_stats,
-    'skills': skills,
     'eat': eat,
     'quests': quests,
 }
@@ -551,15 +621,15 @@ TRAVEL_MAP = {
     'crossroads': crossroads
 }
 SHOP_MAP = {
-            '1': shop_raw_materials,
-            '2': shop_food,
-            '3': shop_weapons,
-            '4': shop_armor,
-            '5': shop_arrows,
-            '6': shop_potions,
-            'x': enter_shop,
-            'X': enter_shop
-        }
+    '1': shop_raw_materials,
+    '2': shop_food,
+    '3': shop_weapons,
+    '4': shop_armor,
+    '5': shop_arrows,
+    '6': shop_potions,
+    'x': enter_shop,
+    'X': enter_shop
+}
 SHOP_RAW_MATERIALS_MAP = {
     '3': iron_ore,
 }
@@ -567,13 +637,18 @@ SHOP_RAW_MATERIALS_MAP = {
 SHOP_WEAPONS_MAP = {
     '1': smiths_hammer,
 }
+
+
 # endregion
 
 # For Dev Testing
 def get_some_stuff():
     print('adding stuff')
-    player.add_item(smiths_hammer, 1)
+    # player.add_item(smiths_hammer, 1)
+    # player.add_exp(50)
+    clock.display_time()
     pause()
+
 
 def main():
     character_creation(player)
@@ -582,5 +657,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-    # this is a git test!
