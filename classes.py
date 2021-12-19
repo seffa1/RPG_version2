@@ -8,11 +8,17 @@ import os
 # region Utility Functions
 def clear():
     os.system('cls')
+
+
 def select():
     a = input("----->")
     return a
+
+
 def pause():
     input("Press enter to continue")
+
+
 # endregion
 
 class Clock:
@@ -20,15 +26,16 @@ class Clock:
         self.day = 1
         self.time = 480
         self.end_day = 1440
+        self.time_left = self.end_day - self.time
         self.minutes = self.time % 60
         self.hours = self.time // 60
 
     def display_time(self):
-        hour_string = str(self.hours)
-        if len(str(self.minutes)) == 1:
-            minute_string = '0' + str(self.minutes)
+        hour_string = str(self.time // 60)
+        if len(str(self.time % 60)) == 1:
+            minute_string = '0' + str(self.time % 60)
         else:
-            minute_string = str(self.minutes)
+            minute_string = str(self.time % 60)
 
         time_string = hour_string + ':' + minute_string
 
@@ -39,6 +46,26 @@ class Clock:
         hours_left = total_minutes_left // 60
 
         print(f'Time Til Dark: {hours_left} hour {minutes_left} minutes')
+
+    def reset(self):
+        self.day += 1
+        self.time = 0
+
+    def add_time(self, add_time: int):
+        # This function adds time to the clock and returns the amount of time over the
+        # End of the day, if any, to be used in another function
+        self.time += add_time
+
+        if self.time == self.end_day:
+            self.reset()
+            return 0
+
+        if self.time > self.end_day:
+            self.reset()
+            return self.time - self.end_day
+
+        else:
+            return
 
 
 # region Game Items
@@ -119,6 +146,8 @@ class Arrow(Game_Item):
 
     def __str__(self):
         pass
+
+
 # endregion
 
 

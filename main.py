@@ -11,12 +11,12 @@ from classes import Location
 from classes import Shop
 from classes import Weapon
 from classes import Raw_Material
-
+import sys
 from dialogue import Dialogue
 import os
-
+from functools import cache
 # endregion
-
+sys.setrecursionlimit(100000)
 
 # region GLOBAL OBJECTS
 player = Player('')
@@ -349,14 +349,25 @@ def fish():
     give_options()
 
 
+@cache
 def gather_sticks():
     clear()
     player.show_stats()
     clock.display_time()
-    a = input('--->')
-    print('You are gathering sticks')
-    pause()
-    give_options()
+    print('---------')
+    print("Enter to gather sticks")
+    print('X ---> Back')
+    a = '1'
+    while a not in ['X', 'x', '']:
+        a = input('--->')
+    if a in ['X', 'x']:
+        give_options()
+    if a in ['']:
+        stick = Raw_Material('stick')
+        player.add_item(stick, 3)
+        clock.add_time(10)
+        gather_sticks()
+
 
 
 def hunt_deer():
@@ -572,6 +583,7 @@ crossroads = Location('crossroads', [], ['village', 'outskirts'])
 # region ITEMS
 # Raw Material
 iron_ore = Raw_Material('iron ore')
+
 # Weapons
 smiths_hammer = Weapon('smiths hammer', 10, 'melee')
 item_prices = {'logs': 4, 'bait': 1, 'iron ore': 10, 'pelt': 10, 'oil': 15, 'cooked fish': 15,
