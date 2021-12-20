@@ -14,7 +14,7 @@ from classes import Raw_Material
 import sys
 from dialogue import Dialogue
 import os
-from functools import cache
+# from functools import cache
 # endregion
 sys.setrecursionlimit(100000)
 
@@ -349,11 +349,12 @@ def fish():
     give_options()
 
 
-@cache
+# @cache
 def gather_sticks():
     clear()
     player.show_stats()
     clock.display_time()
+    player.display_item('stick')
     print('---------')
     print("Enter to gather sticks")
     print('X ---> Back')
@@ -364,6 +365,8 @@ def gather_sticks():
         give_options()
     if a in ['']:
         stick = Raw_Material('stick')
+        # If item not in players inventory, player.add_item
+        # Else, player.update[item]
         player.add_item(stick, 3)
         clock.add_time(10)
         gather_sticks()

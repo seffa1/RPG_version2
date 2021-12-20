@@ -304,6 +304,9 @@ class Character:
         print('E -----> Equip Items')
         print('X -----> Back\n')
 
+    def display_item(self, item_name: str):
+        print(f'{item_name}: {self.inventory[item_name]}')
+
     def add_item(self, item, amount):
         self.inventory.update({item: amount})
 
