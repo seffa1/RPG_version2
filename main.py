@@ -350,11 +350,12 @@ def fish():
 
 
 # @cache
+stick = Raw_Material('stick')
 def gather_sticks():
     clear()
     player.show_stats()
     clock.display_time()
-    player.display_item('stick')
+    player.display_item(stick)
     print('---------')
     print("Enter to gather sticks")
     print('X ---> Back')
@@ -364,10 +365,8 @@ def gather_sticks():
     if a in ['X', 'x']:
         give_options()
     if a in ['']:
-        stick = Raw_Material('stick')
-        # If item not in players inventory, player.add_item
-        # Else, player.update[item]
-        player.add_item(stick, 3)
+        for i in range(0, 3):
+            player.add_item(stick)
         clock.add_time(10)
         gather_sticks()
 

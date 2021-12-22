@@ -304,11 +304,22 @@ class Character:
         print('E -----> Equip Items')
         print('X -----> Back\n')
 
-    def display_item(self, item_name: str):
-        print(f'{item_name}: {self.inventory[item_name]}')
+    def display_item(self, item):
+        print(f'{item.name}: {self.inventory[item]}')
 
-    def add_item(self, item, amount):
-        self.inventory.update({item: amount})
+    def check_has_item(self, item):
+        for i in self.inventory:
+            if str(i.name) == str(item.name):
+                return True
+        return False
+
+    def add_item(self, item):
+        # if we dont have any of this item, add 1
+        if not self.check_has_item(item):
+            self.inventory.update({item: 1})
+        else:
+            self.inventory[item] += 1
+
 
     def remove_item(self, item, amount):
         self.inventory.update({item: -amount})
