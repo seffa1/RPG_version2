@@ -102,8 +102,6 @@ def character_creation(player):
 
 
 
-
-
 def startDay1(player):
     if player.type == 1:
         print("Day 1")
@@ -352,12 +350,32 @@ def fish():
 # @cache
 stick = Raw_Material('stick')
 def gather_sticks():
+    # Configuration
+    dialogue_name = 'sticks'
+    time = 30
+    amount = 3
+    exp = 1
+    gather_material(dialogue_name, time, amount, stick, exp)
+    gather_sticks()
+
+def pick_berries():
+    # Configuration
+    dialogue_name = 'berries'
+    time = 60
+    amount = 5
+    exp = 5
+    gather_material(dialogue_name, time, amount, stick, exp)
+    pick_berries()
+
+
+def gather_material(dialogue_name, time, amount, item, exp):
+    # General gathering
     clear()
     player.show_stats()
     clock.display_time()
-    player.display_item(stick)
+    player.display_item(item)
     print('---------')
-    print("Enter to gather sticks")
+    print(f"Enter to gather {dialogue_name}")
     print('X ---> Back')
     a = '1'
     while a not in ['X', 'x', '']:
@@ -365,10 +383,11 @@ def gather_sticks():
     if a in ['X', 'x']:
         give_options()
     if a in ['']:
-        for i in range(0, 3):
-            player.add_item(stick)
-        clock.add_time(10)
-        gather_sticks()
+        for i in range(0, amount):
+            player.add_item(item)
+        clock.add_time(time)
+        player.add_exp(exp)
+
 
 
 
@@ -393,11 +412,7 @@ def gather_fiber():
     give_options()
 
 
-def pick_berries():
-    clear()
-    print('You are picking berries')
-    pause()
-    give_options()
+
 
 
 def pray():
@@ -517,6 +532,7 @@ def update_options(location):
 def give_options():
     clear()
     print(player)
+    clock.display_time()
     player_menu.show_menu()
     action_menu.show_menu()
     travel_menu.show_menu()

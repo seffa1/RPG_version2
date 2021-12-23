@@ -320,7 +320,6 @@ class Character:
         else:
             self.inventory[item] += 1
 
-
     def remove_item(self, item, amount):
         self.inventory.update({item: -amount})
 
